@@ -291,6 +291,17 @@
   margin-top: 6px;
 }
 
+.prompt-counter {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  margin-top: 6px;
+  text-align: right;
+}
+
+.prompt-counter--over {
+  color: var(--danger);
+}
+
 .prompt-textarea::placeholder {
   color: var(--text-soft);
 }

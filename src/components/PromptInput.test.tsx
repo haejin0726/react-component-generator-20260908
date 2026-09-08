@@ -40,6 +40,26 @@ describe('PromptInput', () => {
     expect(screen.getByRole('button', { name: '컴포넌트 생성' })).toBeDisabled();
   });
 
+  it('입력한 글자 수와 최대 글자 수를 카운터로 보여준다', () => {
+    render(<PromptInput onGenerate={vi.fn()} isLoading={false} history={[]} />);
+
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '프로필 카드' },
+    });
+
+    expect(screen.getByText('6 / 500')).toBeInTheDocument();
+  });
+
+  it('500자를 초과하면 카운터가 초과 상태 스타일 클래스를 갖는다', () => {
+    render(<PromptInput onGenerate={vi.fn()} isLoading={false} history={[]} />);
+
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'a'.repeat(501) },
+    });
+
+    expect(screen.getByText('501 / 500')).toHaveClass('prompt-counter--over');
+  });
+
   it('500자를 초과한 상태에서 제출해도 onGenerate가 호출되지 않는다', () => {
     const onGenerate = vi.fn();
     render(<PromptInput onGenerate={onGenerate} isLoading={false} history={[]} />);
