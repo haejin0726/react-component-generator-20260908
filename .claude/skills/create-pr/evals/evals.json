@@ -1,0 +1,29 @@
+{
+  "skill_name": "create-pr",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "브랜치 feature/profile-badge-with-skill(작업 디렉토리: /tmp/create-pr-fixtures/ko-with_skill)에서 PR을 만들어줘. 초안(제목/본문/브랜치)을 보여주면 나는 그 자리에서 바로 승인할 테니, 승인 이후 실제 push와 PR 생성까지 전 과정을 끝까지 진행해줘.",
+      "expected_output": "한국어 프로젝트임을 자동 감지해 references/pr_template_ko.md 구조(요약/변경 사항/테스트 방법)를 따른 한국어 PR 제목과 본문을 작성하고, 사용자 승인 이후에만 push와 gh pr create를 실행해 실제 PR을 생성한다.",
+      "files": [],
+      "assertions": [
+        "PR이 실제로 GitHub에 생성되었다 (pr_result.json에 유효한 title이 존재)",
+        "base 브랜치가 main이다",
+        "PR 본문이 한국어로 작성되었다 (한글 문자 포함)",
+        "PR 본문이 요약/변경 사항/테스트 방법 섹션 구조를 따른다"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Create a PR for branch feature/date-formatter-with-skill (working directory: /tmp/create-pr-fixtures/en-with_skill). If you show me a title/body/branch draft, I approve it immediately on the spot — please proceed all the way through the actual push and PR creation.",
+      "expected_output": "Auto-detects this as a foreign/English project and follows references/pr_template_en.md structure (Summary/Changes/Test Plan) in English, only pushing and running gh pr create after the user approves the draft.",
+      "files": [],
+      "assertions": [
+        "PR was actually created on GitHub (pr_result.json has a valid title)",
+        "Base branch is main",
+        "PR body is written in English (no significant Hangul characters)",
+        "PR body follows the Summary/Changes/Test Plan section structure"
+      ]
+    }
+  ]
+}
