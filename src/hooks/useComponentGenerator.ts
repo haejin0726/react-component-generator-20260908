@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react';
 import type { GeneratedComponent, Provider } from '../types';
+import { useLocalStorage } from './useLocalStorage';
+import { serializeComponents, deserializeComponents } from '../utils/componentsStorage';
+
+const COMPONENTS_STORAGE_KEY = 'rcg:components';
 
 interface UseComponentGeneratorReturn {
   components: GeneratedComponent[];
@@ -11,7 +15,11 @@ interface UseComponentGeneratorReturn {
 }
 
 export function useComponentGenerator(): UseComponentGeneratorReturn {
-  const [components, setComponents] = useState<GeneratedComponent[]>([]);
+  const [components, setComponents] = useLocalStorage<GeneratedComponent[]>(
+    COMPONENTS_STORAGE_KEY,
+    [],
+    { serialize: serializeComponents, deserialize: deserializeComponents }
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,15 +54,15 @@ export function useComponentGenerator(): UseComponentGeneratorReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setComponents]);
 
   const removeComponent = useCallback((id: string) => {
     setComponents((prev) => prev.filter((c) => c.id !== id));
-  }, []);
+  }, [setComponents]);
 
   const clearAll = useCallback(() => {
     setComponents([]);
-  }, []);
+  }, [setComponents]);
 
   return { components, isLoading, error, generate, removeComponent, clearAll };
 }

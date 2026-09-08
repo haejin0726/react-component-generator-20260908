@@ -330,7 +330,8 @@
   gap: 8px;
 }
 
-.prompt-examples {
+.prompt-examples,
+.prompt-history {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -344,7 +345,8 @@
   font-weight: 650;
 }
 
-.example-chip {
+.example-chip,
+.history-chip {
   min-height: 58px;
   padding: 12px 13px;
   background: var(--surface-subtle);
@@ -361,7 +363,8 @@
     color 0.16s ease;
 }
 
-.example-chip:hover {
+.example-chip:hover,
+.history-chip:hover {
   background: var(--primary-soft);
   border-color: #bfdbfe;
   color: #1d4ed8;
@@ -702,7 +705,8 @@
     width: 100%;
   }
 
-  .prompt-examples {
+  .prompt-examples,
+  .prompt-history {
     grid-template-columns: 1fr;
   }
 
