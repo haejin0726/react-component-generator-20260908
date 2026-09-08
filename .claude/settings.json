@@ -1,5 +1,20 @@
 {
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true
+  },
+  "permissions": {
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git branch -D*)",
+      "Read(.env*)", 
+      "Read(*credentials*)", 
+      "Read(*secrets*)",
+      "Bash(cat .env*)", 
+      "Bash(cat *secrets*)"
+    ]
+
   }
 }

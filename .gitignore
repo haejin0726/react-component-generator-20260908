@@ -34,3 +34,6 @@ dist-ssr
 
 # playwright-cli 세션 산출물
 .playwright-cli/
+
+# skill-creator 평가 산출물 (스크래치 테스트 결과, 커밋 대상 아님)
+.claude/skills/*-workspace/
