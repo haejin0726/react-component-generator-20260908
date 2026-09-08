@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import type { GeneratedComponent, Provider } from '../types';
 import { useLocalStorage } from './useLocalStorage';
 import { serializeComponents, deserializeComponents } from '../utils/componentsStorage';
+import { splitSSEEvents, parseGenerateStreamPayloads } from '../utils/sse';
 
 const COMPONENTS_STORAGE_KEY = 'rcg:components';
 
@@ -27,6 +28,16 @@ export function useComponentGenerator(): UseComponentGeneratorReturn {
     setIsLoading(true);
     setError(null);
 
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const placeholder: GeneratedComponent = {
+      id,
+      prompt,
+      code: '',
+      createdAt: new Date(),
+      isStreaming: true,
+    };
+    setComponents((prev) => [placeholder, ...prev]);
+
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -34,23 +45,46 @@ export function useComponentGenerator(): UseComponentGeneratorReturn {
         body: JSON.stringify({ prompt, ...(apiKey && { apiKey }), provider }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to generate component');
       }
 
-      const newComponent: GeneratedComponent = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        prompt,
-        code: data.code,
-        createdAt: new Date(),
-      };
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let streamError: string | null = null;
 
-      setComponents((prev) => [newComponent, ...prev]);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const { payloads, remainder } = splitSSEEvents(buffer);
+        buffer = remainder;
+
+        for (const event of parseGenerateStreamPayloads(payloads)) {
+          if (event.type === 'delta') {
+            setComponents((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, code: c.code + event.text } : c))
+            );
+          } else if (event.type === 'done') {
+            setComponents((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, code: event.code, isStreaming: false } : c))
+            );
+          } else if (event.type === 'error') {
+            streamError = event.error;
+          }
+        }
+      }
+
+      if (streamError) {
+        throw new Error(streamError);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
       setError(message);
+      setComponents((prev) => prev.filter((c) => c.id !== id));
     } finally {
       setIsLoading(false);
     }
