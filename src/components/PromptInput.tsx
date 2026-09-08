@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { validatePromptLength } from '../utils/validatePromptLength';
 
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
@@ -16,10 +17,11 @@ const EXAMPLES = [
 
 export function PromptInput({ onGenerate, isLoading }: PromptInputProps) {
   const [prompt, setPrompt] = useState('');
+  const validation = validatePromptLength(prompt);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim() && !isLoading) {
+    if (prompt.trim() && !isLoading && validation.isValid) {
       onGenerate(prompt.trim());
     }
   };
@@ -35,22 +37,25 @@ export function PromptInput({ onGenerate, isLoading }: PromptInputProps) {
         <h2>무엇을 만들까요?</h2>
       </div>
       <form onSubmit={handleSubmit} className="prompt-form">
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="예: 고객 목록 테이블 위에 들어갈 검색 필터 바를 만들어줘. 상태, 담당자, 날짜 범위 필터가 필요해."
-          className="prompt-textarea"
-          rows={3}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-              handleSubmit(e);
-            }
-          }}
-        />
+        <div className="prompt-textarea-wrap">
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="예: 고객 목록 테이블 위에 들어갈 검색 필터 바를 만들어줘. 상태, 담당자, 날짜 범위 필터가 필요해."
+            className="prompt-textarea"
+            rows={3}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                handleSubmit(e);
+              }
+            }}
+          />
+          {validation.error && <p className="prompt-error">{validation.error}</p>}
+        </div>
         <button
           type="submit"
           className="btn-generate"
-          disabled={!prompt.trim() || isLoading}
+          disabled={!prompt.trim() || isLoading || !validation.isValid}
         >
           {isLoading ? (
             <span className="loading-spinner">생성 중...</span>

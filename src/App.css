@@ -273,12 +273,22 @@
   align-items: end;
 }
 
+.prompt-textarea-wrap {
+  min-width: 0;
+}
+
 .prompt-textarea {
   min-height: 138px;
   padding: 18px 18px;
   resize: vertical;
   font-size: 1.02rem;
   line-height: 1.65;
+}
+
+.prompt-error {
+  color: #991b1b;
+  font-size: 0.85rem;
+  margin-top: 6px;
 }
 
 .prompt-textarea::placeholder {
